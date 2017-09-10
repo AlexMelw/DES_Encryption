@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Security.Cryptography;
     using AlgorithmTables;
+    using EasySharp.NHelpers.CustomExMethods;
     using Utils;
 
     class SymmetricEncryption
@@ -41,6 +42,15 @@
             var Dprev = new Queue<Bit>(tempD0);
 
             cdParts = new CD[16];
+            for (var index = 0; index < cdParts.Length; index++)
+            {
+                CD cd = new CD
+                {
+                    C = new Bit[28].SetToDefaults(),
+                    D = new Bit[28].SetToDefaults()
+                };
+                cdParts[index] = cd;
+            }
 
             for (int i = 0; i < 16; i++)
             {
@@ -75,7 +85,7 @@
 
                 foreach (int currentPositionPC2 in PC2Table.Table)
                 {
-                    nKey.AddLast(cdSource[currentPositionPC2]);
+                    nKey.AddLast(cdSource[currentPositionPC2 - 1]);
                 }
 
                 subKeys[i] = nKey.ToArray();
@@ -88,7 +98,7 @@
 
             foreach (int currentPositionPC1 in PC1Table.Table)
             {
-                permutedKeyLinkedList.AddLast(keyOriginalBitArray[currentPositionPC1]);
+                permutedKeyLinkedList.AddLast(keyOriginalBitArray[currentPositionPC1-1]);
             }
 
             return permutedKeyLinkedList.ToArray();

@@ -56,9 +56,15 @@
     <Compile Include="Interfaces\IDesEncryptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymmetricEncryption.cs" />
+    <Compile Include="Utils\BinaryNumbersMapper.cs" />
     <Compile Include="Utils\BinaryUtil.cs" />
     <Compile Include="Utils\RandomNumbersUtil.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\EasySharp\NHelpers\NHelpers.csproj">
+      <Project>{cac83cf1-e5d4-45f6-85cc-e0ad29b55a8e}</Project>
+      <Name>NHelpers</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

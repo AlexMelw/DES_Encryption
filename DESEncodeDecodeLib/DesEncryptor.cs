@@ -5,6 +5,7 @@
     using System.Linq;
     using AlgorithmTables;
     using Interfaces;
+    using Utils;
 
     class DesEncryptor : SymmetricEncryption, IDesEncryptor
     {
@@ -30,7 +31,7 @@
 
         private void EncryptDataBlocks()
         {
-            for (int index = 0; index < paddedBitArray.Length - BlockSize; index += BlockSize)
+            for (int index = 0; index < paddedBitArray.Length - BlockSize + 1; index += BlockSize)
             {
                 Encrypt64BitBlock(paddedBitArray,
                     from: index,
@@ -42,11 +43,11 @@
         {
             Bit[] currentDataBlock = data.Skip(from).Take(to).ToArray();
 
-            LinkedList<Bit> ipDataVector = new LinkedList<Bit>(currentDataBlock);
+            LinkedList<Bit> ipDataVector = new LinkedList<Bit>();
 
             foreach (int currentIpPosition in InitialPermutation.Table)
             {
-                ipDataVector.AddLast(currentDataBlock[currentIpPosition]);
+                ipDataVector.AddLast(currentDataBlock[currentIpPosition-1]);
             }
 
             Bit[] lhsPrev = ipDataVector.Take(BlockSize / 2).ToArray();
@@ -75,10 +76,42 @@
 
             for (int i = 0; i < subKey.Length; i++)
             {
-                xoredBits[i] = rhsPrev[i] ^ subKey[i];
+                xoredBits[i] = expandedTo48BitsBlock[i] ^ subKey[i];
             }
 
-            return xoredBits;
+            return TransformXored48BitBlockTo32Bit(xoredBits);
+        }
+
+        private Bit[] TransformXored48BitBlockTo32Bit(Bit[] BitsBlock48)
+        {
+            LinkedList<Bit> bitsBlock32 = new LinkedList<Bit>();
+
+            int segmentSize = 6;
+            int penultBlock = BitsBlock48.Length - segmentSize;
+
+            for (int i = 0; i < penultBlock; i += segmentSize)
+            {
+                Bit[] sixBits = BitsBlock48.Skip(i).Take(i + segmentSize).ToArray();
+                Bit[] fourBits = UnboxingFourBits(sixBits);
+
+                foreach (Bit bit in fourBits)
+                {
+                    bitsBlock32.AddLast(bit);
+                }
+            }
+
+            return bitsBlock32.ToArray();
+        }
+
+        private Bit[] UnboxingFourBits(Bit[] sixBits)
+        {
+            Bit[] binRow = { sixBits.First(), sixBits.Last() };
+            Bit[] binCol = { sixBits[1], sixBits[2], sixBits[3], sixBits[4] };
+
+            int decRow = BinaryNumbersMapper.TwoBitsDecimalMapping[binRow];
+            int decCol = BinaryNumbersMapper.FourBitsDecimalMapping[binCol];
+
+            return null;
         }
 
         private Bit[] ExpandFrom32To48(Bit[] rhs)
@@ -87,7 +120,7 @@
 
             foreach (int currentPosition in EBitSelection.Table)
             {
-                expandedBlock.AddLast(rhs[currentPosition]);
+                expandedBlock.AddLast(rhs[currentPosition-1]);
             }
 
             return expandedBlock.ToArray();
