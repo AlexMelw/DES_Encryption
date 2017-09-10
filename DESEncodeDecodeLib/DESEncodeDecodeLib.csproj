@@ -41,13 +41,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlgorithmTables\EBitSelection.cs" />
+    <Compile Include="AlgorithmTables\FinalPermutationIP.cs" />
+    <Compile Include="AlgorithmTables\PenultPermutation.cs" />
     <Compile Include="AlgorithmTables\InitialPermutation.cs" />
     <Compile Include="AlgorithmTables\PC1Table.cs" />
     <Compile Include="AlgorithmTables\PC2Table.cs" />
     <Compile Include="AlgorithmTables\S1Boxes.cs" />
     <Compile Include="AlgorithmTables\ShiftsIterationsRelation.cs" />
+    <Compile Include="Bit.cs" />
     <Compile Include="CryptoFactory.cs" />
+    <Compile Include="DesDecryptor.cs" />
+    <Compile Include="DesEncryptor.cs" />
+    <Compile Include="Interfaces\IDesDecryptor.cs" />
+    <Compile Include="Interfaces\IDesEncryptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SymmetricEncryption.cs" />
+    <Compile Include="Utils\BinaryUtil.cs" />
+    <Compile Include="Utils\RandomNumbersUtil.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

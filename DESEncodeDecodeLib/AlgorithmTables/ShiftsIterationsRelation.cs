@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DESEncodeDecodeLib.AlgorithmTables
 {
-    public class ShiftsIterationsRelation
+    public static class ShiftsIterationsRelation
     {
-        public Dictionary<int, int> ShiftsNumberDictionary { get; } = new Dictionary<int, int>
+        public static Dictionary<int, int> ShiftsNumberDictionary { get; } = new Dictionary<int, int>
         {
             [1] = 1,
             [2] = 1,

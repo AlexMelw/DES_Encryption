@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DESEncodeDecodeLib
+﻿namespace DESEncodeDecodeLib
 {
-    public class CryptoFactory
-    {
-        public DESEncryptor GetDESEncryptor(string input) => default(DESEncryptor);
-    }
+    using Interfaces;
 
-    public class DESEncryptor { }
+    public static class CryptoFactory
+    {
+        public static IDesEncryptor CreateDesEncryptor(byte[] data, byte[] key)
+        {
+            return new DesEncryptor(data, key);
+        }
+
+        public static IDesDecryptor CreateDesDecryptor(byte[] data, byte[] key)
+        {
+            return new DesDecryptor(data, key);
+        }
+    }
 }
