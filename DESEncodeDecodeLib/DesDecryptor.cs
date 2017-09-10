@@ -10,10 +10,7 @@
         #region CONSTRUCTORS
 
         public DesDecryptor(byte[] data, byte[] key)
-        {
-            _data = data;
-            _key = key;
-        }
+            : base(data, key) { }
 
         #endregion
 

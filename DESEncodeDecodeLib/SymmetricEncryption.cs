@@ -10,13 +10,13 @@
 
     class SymmetricEncryption
     {
-        protected static int BlockSize = 64;
+        protected const int BlockSize = 64;
         protected readonly byte[] data;
         protected readonly byte[] key;
         protected Bit[] keyOriginalBitArray;
         protected Bit[] paddedBitArray;
-        private static CD[] _cdParts;
-        private Bit[][] _subKeys;
+        protected CD[] cdParts;
+        protected Bit[][] subKeys;
 
         protected SymmetricEncryption(byte[] data, byte[] key)
         {
@@ -30,7 +30,7 @@
             Generate16SubKeys();
         }
 
-        private static void GenerateCDpartsarts(Bit[] permutedKeyByPc1)
+        private void GenerateCDpartsarts(Bit[] permutedKeyByPc1)
         {
             int count = permutedKeyByPc1.Length;
 
@@ -40,7 +40,7 @@
             var Cprev = new Queue<Bit>(tempC0);
             var Dprev = new Queue<Bit>(tempD0);
 
-            _cdParts = new CD[16];
+            cdParts = new CD[16];
 
             for (int i = 0; i < 16; i++)
             {
@@ -55,27 +55,30 @@
                     Dn.Enqueue(Dn.Dequeue());
                 }
 
-                _cdParts[i].C = Cn.ToArray();
-                _cdParts[i].D = Dn.ToArray();
+                cdParts[i].C = Cn.ToArray();
+                cdParts[i].D = Dn.ToArray();
+
+                Cprev = new Queue<Bit>(Cn);
+                Dprev = new Queue<Bit>(Dn);
             }
         }
 
         private void Generate16SubKeys()
         {
-            _subKeys = new Bit[16][];
+            subKeys = new Bit[16][];
 
             for (int i = 0; i < 16; i++)
             {
                 LinkedList<Bit> nKey = new LinkedList<Bit>();
 
-                Bit[] cdSource = _cdParts[i].C.Concat(_cdParts[i].D).ToArray();
+                Bit[] cdSource = cdParts[i].C.Concat(cdParts[i].D).ToArray();
 
                 foreach (int currentPositionPC2 in PC2Table.Table)
                 {
                     nKey.AddLast(cdSource[currentPositionPC2]);
                 }
 
-                _subKeys[i] = nKey.ToArray();
+                subKeys[i] = nKey.ToArray();
             }
         }
 
@@ -92,7 +95,7 @@
         }
 
 
-        class CD
+        protected class CD
         {
             public Bit[] C { get; set; }
             public Bit[] D { get; set; }
@@ -132,14 +135,14 @@
         }
 
 
-        private static void PadWithZeros(LinkedList<Bit> bitsList, out int paddingBits,
+        private void PadWithZeros(LinkedList<Bit> bitsList, out int paddingBits,
             out LinkedList<Bit> paddedBitList)
         {
             int lastByteSize = 8;
 
             long originalLength = bitsList.LongCount() + lastByteSize;
 
-            int toBePadded = (int)(originalLength % 64);
+            int toBePadded = (int) (originalLength % 64);
 
             paddingBits = toBePadded == 0
                 ? lastByteSize
@@ -180,7 +183,7 @@
 
             for (int i = 0; i < 8; i++)
             {
-                eightBits[i] = (byte)(octet & (0b1000_0000 >> i));
+                eightBits[i] = (byte) (octet & (0b1000_0000 >> i));
             }
 
             return eightBits;
