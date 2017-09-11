@@ -98,7 +98,7 @@
 
             foreach (int currentPositionPC1 in PC1Table.Table)
             {
-                permutedKeyLinkedList.AddLast(keyOriginalBitArray[currentPositionPC1-1]);
+                permutedKeyLinkedList.AddLast(keyOriginalBitArray[currentPositionPC1 - 1]);
             }
 
             return permutedKeyLinkedList.ToArray();
@@ -158,6 +158,7 @@
                 ? lastByteSize
                 : lastByteSize + toBePadded;
             paddedBitList = bitsList;
+
             for (int i = 0; i < toBePadded; i++)
             {
                 paddedBitList.AddLast(0);
@@ -187,7 +188,7 @@
             return TransformToBitLinkedList(bytes).ToArray();
         }
 
-        private Bit[] StripBits(byte octet)
+        protected Bit[] StripBits(byte octet)
         {
             Bit[] eightBits = new Bit[8];
 
@@ -197,6 +198,19 @@
             }
 
             return eightBits;
+        }
+
+        protected Bit[] StripFourBits(byte octet)
+        {
+            Bit[] fourBits = new Bit[4];
+
+            for (int i = 4; i < 8; i++)
+            {
+                int bitIndex = i - 4;
+                fourBits[bitIndex] = (byte) (octet & (0b1000_0000 >> i));
+            }
+
+            return fourBits;
         }
     }
 }

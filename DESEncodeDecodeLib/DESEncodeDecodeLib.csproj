@@ -46,7 +46,7 @@
     <Compile Include="AlgorithmTables\InitialPermutation.cs" />
     <Compile Include="AlgorithmTables\PC1Table.cs" />
     <Compile Include="AlgorithmTables\PC2Table.cs" />
-    <Compile Include="AlgorithmTables\S1Boxes.cs" />
+    <Compile Include="AlgorithmTables\SBoxMapper.cs" />
     <Compile Include="AlgorithmTables\ShiftsIterationsRelation.cs" />
     <Compile Include="Bit.cs" />
     <Compile Include="CryptoFactory.cs" />
