@@ -9,7 +9,7 @@
     {
         static void Main(string[] args)
         {
-            byte[] data = RandomNumbersUtil.GenerateRandomNumbers(7);
+            byte[] data = RandomNumbersUtil.GenerateRandomNumbers(15);
             byte[] key = RandomNumbersUtil.GenerateRandomNumbers(8);
 
             IDesEncryptor desEncryptor = CryptoFactory.CreateDesEncryptor(data, key);
