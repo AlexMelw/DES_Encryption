@@ -1,28 +1,87 @@
 ﻿namespace DES_Encoder_CLI
 {
     using System;
-    using DESEncodeDecodeLib;
-    using DESEncodeDecodeLib.Interfaces;
-    using DESEncodeDecodeLib.Utils;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Text;
+    using CommandLine;
+    using CommandLine.Text;
 
     static class Program
     {
         static void Main(string[] args)
         {
-            byte[] data = RandomNumbersUtil.GenerateRandomNumbers(15);
-            byte[] key = RandomNumbersUtil.GenerateRandomNumbers(8);
+            //EncryptVerbOptions encrypt = new EncryptVerbOptions
+            //{
+            //    KeyPath = @"""Lalalalla"""
+            //};
 
-            IDesEncryptor desEncryptor = CryptoFactory.CreateDesEncryptor(data, key);
-            //IDesDecryptor desDecryptor = CryptoFactory.CreateDesDecryptor(data, key);
+            //string line = Parser.Default.FormatCommandLine(encrypt);
 
-            byte[] encryptedData = desEncryptor.EncryptData();
+            //Console.Out.WriteLine("line = {0}", line);
 
-            //Bit bit1 = 0;
-            //Bit bit2 = 0;
-            //Console.Out.WriteLine(bit1 ? $"Bit is 1 [{bit1}]" : $"Bit is 0 [{bit1}]");
-            //Console.Out.WriteLine((byte)bit1);
-            //Console.Out.WriteLine((byte)bit2);
-            //Console.Out.WriteLine("bit1 == bit2 = {0}", bit1.Equals(bit2));
+            Parser.Default.ParseArguments<EncryptVerbOptions, DecryptVerbOptions>(args)
+                .WithParsed<EncryptVerbOptions>(opts => { })
+                .WithParsed<DecryptVerbOptions>(opts => { })
+                .WithNotParsed(errors => { });
+        }
+
+        private static void ProcessCommand(string verb, object subOptions) { }
+    }
+
+    abstract class CommonSubOptions
+    {
+        [Option('i', "input", Required = true,
+            HelpText = "Source file containing the data to be encrypted with a given key.")]
+        public string InputFilePath { get; set; }
+
+
+        [Option('k', "key", Required = true,
+            HelpText = "Path to file containing 64-bit key for encryption of data from supplied file.")]
+        public string KeyPath { get; set; }
+    }
+
+    [Verb("enc", HelpText = "Enforces file encryption with the specified key.")]
+    class EncryptVerbOptions : CommonSubOptions
+    {
+        [Option('o', "output",
+            HelpText = "Output File Name. This file will contain the result of the decryption operation.")]
+        public string OutputFilePath { get; set; }
+
+        [Usage(ApplicationAlias = "DesCLI")]
+        public static IEnumerable<Example> Examples
+        {
+            get
+            {
+                yield return new Example("Encryption", new EncryptVerbOptions
+                {
+                    KeyPath = "MyKey.txt",
+                    InputFilePath = "ToBeEncrypted.txt",
+                    OutputFilePath = "Encrypted.txt"
+                });
+            }
+        }
+
+    }
+
+    [Verb("dec", HelpText = "Enforces file decrypt with the specified key.")]
+    class DecryptVerbOptions : CommonSubOptions
+    {
+        [Option('o', "output",
+            HelpText = "Output File Name. This file will contain the result of the encryption operation.")]
+        public string OutputFilePath { get; set; }
+
+        [Usage(ApplicationAlias = "DesCLI")]
+        public static IEnumerable<Example> Examples
+        {
+            get {
+                yield return new Example("Decryption", new EncryptVerbOptions
+                {
+                    KeyPath = "MyKey.txt",
+                    InputFilePath = "ToBeDecrypted.txt",
+                    OutputFilePath = "Decrypted.txt"
+                });
+            }
         }
     }
 }

@@ -1,5 +1,18 @@
 ﻿namespace DESEncodeDecodeLib
 {
+    /// <summary>
+    ///     <para>This custom data type simulates manipulating elementary binary data (bit).</para>
+    ///     <example>
+    ///         Bit bit1 = 0;
+    ///         Bit bit2 = 1;
+    ///         Console.Out.WriteLine(bit1.IsSet ? $"Bit is 1 [{bit1}]" : $"Bit is 0 [{bit1}]"); //Bit is 0 [0]
+    ///         Console.Out.WriteLine(bit1 ? $"Bit is 1 [{bit1}]" : $"Bit is 0 [{bit1}]"); //Bit is 0 [0]
+    ///         Console.Out.WriteLine(bit2 ? $"Bit is 1 [{bit2}]" : $"Bit is 0 [{bit2}]"); //Bit is 1 [1]
+    ///         Console.Out.WriteLine((byte)bit1); //0
+    ///         Console.Out.WriteLine((byte)bit2); //1
+    ///         Console.Out.WriteLine("bit1 == bit2 is {0}", bit1.Equals(bit2)); //bit1 == bit2 is False
+    ///     </example>
+    /// </summary>
     public struct Bit
     {
         public bool IsSet { get; }

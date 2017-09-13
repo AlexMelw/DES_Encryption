@@ -7,7 +7,7 @@
     <ProjectGuid>{4EF17CAC-77D8-4999-A8C6-2BEAAF71FC9F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>DES_Encoder_CLI</RootNamespace>
-    <AssemblyName>DES_Encoder_CLI</AssemblyName>
+    <AssemblyName>DesCLI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -53,6 +53,11 @@
       <Project>{6cca1bb2-3a1b-4d7c-b644-68fc12ba65b0}</Project>
       <Name>DESEncodeDecodeLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser">
+      <Version>2.1.1-beta</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -9,8 +9,7 @@
     {
         #region CONSTRUCTORS
 
-        public DesEncryptor(byte[] data, byte[] key)
-            : base(data, key) { }
+        public DesEncryptor(byte[] data, byte[] key) : base(data, key) { }
 
         #endregion
 
@@ -27,7 +26,6 @@
             return encryptedBytes;
         }
 
-
         protected override void ApplyDesOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count)
         {
             Bit[] currentDataBlock = data.Skip(from).Take(count).ToArray();
@@ -40,7 +38,6 @@
 
             FillSourceDataBlockWithDesEncryptedData(data, finalIpPermutationBitArray, from, count);
         }
-
 
         private Bit[] EncryptDataBlocks(Bit[][] subKeys, Bit[] paddedBitArray)
         {
@@ -60,7 +57,6 @@
                 sourceDataBits[cursor] = encryptedBlock[index++];
             }
         }
-
 
         private Bit[] ComputeR16L16(Bit[][] subKeys, Bit[] ipDataVector)
         {
