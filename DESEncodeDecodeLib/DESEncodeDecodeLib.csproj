@@ -50,12 +50,12 @@
     <Compile Include="AlgorithmTables\ShiftsIterationsRelation.cs" />
     <Compile Include="Bit.cs" />
     <Compile Include="CryptoFactory.cs" />
-    <Compile Include="DesDecryptor.cs" />
-    <Compile Include="DesEncryptor.cs" />
+    <Compile Include="Decryption\DesDecryptor.cs" />
+    <Compile Include="Encryption\DesEncryptor.cs" />
     <Compile Include="Interfaces\IDesDecryptor.cs" />
     <Compile Include="Interfaces\IDesEncryptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SymmetricEncryption.cs" />
+    <Compile Include="Base\DesEncryptionBase.cs" />
     <Compile Include="Utils\BinaryNumbersMapper.cs" />
     <Compile Include="Utils\BinaryUtil.cs" />
     <Compile Include="Utils\RandomNumbersUtil.cs" />

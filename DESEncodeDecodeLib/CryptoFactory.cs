@@ -1,5 +1,7 @@
 ﻿namespace DESEncodeDecodeLib
 {
+    using Decryption;
+    using Encryption;
     using Interfaces;
 
     public static class CryptoFactory
