@@ -40,10 +40,7 @@
     {
         public bool Equals(Bit[] x, Bit[] y)
         {
-            if (x == null || y == null)
-            {
-                return false;
-            }
+            if (x == null || y == null) return false; 
 
             bool notEqual = !x.Where((t, i) => t != y[i]).Any();
 

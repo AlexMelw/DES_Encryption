@@ -4,6 +4,16 @@
     {
         public bool IsSet { get; }
 
+        public bool Equals(Bit other)
+        {
+            return IsSet == other.IsSet;
+        }
+
+        public override int GetHashCode()
+        {
+            return IsSet.GetHashCode();
+        }
+
         private Bit(bool flag)
         {
             IsSet = flag;
@@ -19,7 +29,6 @@
         {
             return (byte) (bit.IsSet ? 1 : 0);
         }
-
 
         // To Bit
         public static implicit operator Bit(bool flag)
@@ -74,15 +83,14 @@
         // Comparison operators
         public static bool operator ==(Bit b1, Bit b2)
         {
-            return (b1.IsSet && b2.IsSet) || (!b1.IsSet && !b2.IsSet);
+            return b1.IsSet && b2.IsSet || !b1.IsSet && !b2.IsSet;
         }
 
         public static bool operator !=(Bit b1, Bit b2) => !(b1 == b2);
 
-
         public static bool operator ==(Bit bit, byte octet)
         {
-            return (bit.IsSet && octet == 0) || (!bit.IsSet && octet == 1);
+            return bit.IsSet && octet == 0 || !bit.IsSet && octet == 1;
         }
 
         public static bool operator ==(byte octet, Bit bit) => bit == octet;

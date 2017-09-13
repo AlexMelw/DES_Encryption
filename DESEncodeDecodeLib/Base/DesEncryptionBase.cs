@@ -10,25 +10,44 @@
     abstract class DesEncryptionBase
     {
         protected const int BlockSize = 64;
-        protected readonly byte[] data;
-        protected readonly byte[] key;
+        private readonly byte[] Data;
+        private readonly byte[] Key;
+        private Bit[] Key64BitArray;
 
-        protected Bit[] keyOriginalBitArray;
-        //protected Bit[] paddedBitArray;
-        //protected CD[] cdParts;
-        //protected Bit[][] subKeys;
+        #region CONSTRUCTORS
+
+        protected DesEncryptionBase(byte[] data, byte[] key)
+        {
+            Data = data;
+            Key = key;
+        }
+
+        #endregion
 
         protected abstract void ApplyDesOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count);
 
-        protected void TransformDataApplyingSubkeys(Bit[][] subKeys, Bit[] paddedBitArray)
+        protected void InitializeDesEngine(out Bit[] paddedBitArray, out Bit[][] subKeys)
+        {
+            // bytes -> Bits
+            Key64BitArray = TransformToBitArray(Key);
+            paddedBitArray = ToPaddedBitArray(Data);
+
+            // Phase I
+            Bit[] permutedKeyByPc1 = PermuteKeyByPc1();
+
+            // Phase II
+            subKeys = GenerateSubKeys(permutedKeyByPc1);
+        }
+
+        protected void TransformDataApplyingSubkeys(Bit[][] subKeys, ref Bit[] paddedBitArray)
         {
             for (int index = 0; index <= paddedBitArray.Length - BlockSize; index += BlockSize)
             {
                 ApplyDesOn64BitBlock(
-                    subKeys: subKeys,
-                    data: paddedBitArray,
-                    @from: index,
-                    count: BlockSize);
+                    subKeys,
+                    paddedBitArray,
+                    index,
+                    BlockSize);
             }
         }
 
@@ -66,29 +85,58 @@
             rhsN = null;
             for (int i = 0; i < 16; i++)
             {
-                lhsN = CloneBitArray(rhsPrev);
-                rhsN = XorArrays(
-                    leftOperand: CloneBitArray(lhsPrev),
-                    rightOperand: XorRhsPrevWithNKey(rhsPrev, subKeys[i]));
+                lhsN = rhsPrev.CloneArray();
+                rhsN = BinaryUtil.XorArrays(
+                    lhsPrev.CloneArray(),
+                    XorRhsPrevWithNKey(rhsPrev, subKeys[i]));
 
-                lhsPrev = CloneBitArray(lhsN);
-                rhsPrev = CloneBitArray(rhsN);
+                lhsPrev = lhsN.CloneArray();
+                rhsPrev = rhsN.CloneArray();
             }
         }
 
-
-        protected Bit[] CloneBitArray(Bit[] source)
+        protected Bit[][] GenerateSubKeys(Bit[] permutedKeyByPc1)
         {
-            Bit[] destination = new Bit[source.Length];
-            Array.Copy(source, destination, source.Length);
-            return destination;
+            CD[] cdParts = GenerateCdParts(permutedKeyByPc1);
+            Bit[][] subKeys = Generate16SubKeys(cdParts);
+
+            return subKeys;
         }
 
-        protected Bit[] XorRhsPrevWithNKey(Bit[] rhsPrev, Bit[] subKey)
+        protected Bit[] PermuteKeyByPc1()
+        {
+            LinkedList<Bit> permutedKeyLinkedList = new LinkedList<Bit>();
+
+            foreach (int currentPositionPC1 in PC1Table.Table)
+            {
+                permutedKeyLinkedList.AddLast(Key64BitArray[currentPositionPC1 - 1]);
+            }
+
+            return permutedKeyLinkedList.ToArray();
+        }
+
+        protected Bit[] ToPaddedBitArray(byte[] bytes)
+        {
+            LinkedList<Bit> bitsList = BinaryUtil.TransformToBitLinkedList(bytes);
+
+            PadWithZeros(bitsList, out int paddingBits, out LinkedList<Bit> paddedBitList);
+
+            AppendPaddingBitsNumber(paddingBits, paddedBitList);
+
+            return paddedBitList.ToArray();
+        }
+
+        protected Bit[] TransformToBitArray(byte[] bytes)
+        {
+            return BinaryUtil.TransformToBitLinkedList(bytes).ToArray();
+        }
+
+
+        private Bit[] XorRhsPrevWithNKey(Bit[] rhsPrev, Bit[] subKey)
         {
             Bit[] expandedTo48BitsBlock = ExpandFrom32To48(rhsPrev);
 
-            Bit[] xored48BitBlock = XorArrays(subKey, expandedTo48BitsBlock);
+            Bit[] xored48BitBlock = BinaryUtil.XorArrays(subKey, expandedTo48BitsBlock);
 
             Bit[] xored32BitBlock = TransformXored48BitBlockTo32Bit(xored48BitBlock);
 
@@ -97,7 +145,7 @@
             return penultBitsPermutationArray.ToArray();
         }
 
-        protected Bit[] ExecutePenultPermutation(Bit[] xored32BitBlock)
+        private Bit[] ExecutePenultPermutation(Bit[] xored32BitBlock)
         {
             LinkedList<Bit> penultPermutedBitsLinkedList = new LinkedList<Bit>(xored32BitBlock);
 
@@ -109,20 +157,8 @@
             return penultPermutedBitsLinkedList.ToArray();
         }
 
-        protected Bit[] XorArrays(Bit[] leftOperand, Bit[] rightOperand)
-        {
-            Bit[] xoredBits = new Bit[leftOperand.Length];
 
-            for (int i = 0; i < leftOperand.Length; i++)
-            {
-                xoredBits[i] = leftOperand[i] ^ rightOperand[i];
-            }
-
-            return xoredBits;
-        }
-
-
-        protected Bit[] TransformXored48BitBlockTo32Bit(Bit[] BitsBlock48)
+        private Bit[] TransformXored48BitBlockTo32Bit(Bit[] BitsBlock48)
         {
             LinkedList<Bit> bitsBlock32 = new LinkedList<Bit>();
 
@@ -145,7 +181,7 @@
         }
 
 
-        protected Bit[] UnboxingFourBits(Bit[] sixBits, int boxIndex)
+        private Bit[] UnboxingFourBits(Bit[] sixBits, int boxIndex)
         {
             Bit[] binRow = { sixBits.First(), sixBits.Last() };
             Bit[] binCol = { sixBits[1], sixBits[2], sixBits[3], sixBits[4] };
@@ -160,7 +196,7 @@
         }
 
 
-        protected Bit[] ExpandFrom32To48(Bit[] rhs)
+        private Bit[] ExpandFrom32To48(Bit[] rhs)
         {
             LinkedList<Bit> expandedBlock = new LinkedList<Bit>();
 
@@ -173,43 +209,20 @@
         }
 
 
-        protected byte[] TransformBitsToBytes(Bit[] bits)
+        private Bit[] StripFourBits(byte octet)
         {
-            int bytesCount = bits.Length / 8;
-            byte[] octets = new byte[bytesCount];
-            octets.SelfSetToDefaults();
+            Bit[] fourBits = new Bit[4];
 
-            for (int byteIdx = 0; byteIdx < bytesCount; byteIdx++)
+            for (int i = 4; i < 8; i++)
             {
-                int bitOffset = byteIdx * 8;
-
-                for (int bitIdx = bitOffset; bitIdx < bitOffset + 8; bitIdx++)
-                {
-                    octets[byteIdx] = (byte) (octets[byteIdx] | (bits[bitIdx]
-                                                  ? 0b1000_0000 >> (bitIdx % 8)
-                                                  : 0x0));
-                }
+                int bitIndex = i - 4;
+                fourBits[bitIndex] = (byte) (octet & (0b1000_0000 >> i));
             }
 
-            return octets;
+            return fourBits;
         }
 
-
-        protected DesEncryptionBase(byte[] data, byte[] key)
-        {
-            this.data = data;
-            this.key = key;
-        }
-
-        protected Bit[][] GenerateSubKeys(Bit[] permutedKeyByPc1)
-        {
-            CD[] cdParts = GenerateCDpartsarts(permutedKeyByPc1);
-            Bit[][] subKeys = Generate16SubKeys(cdParts);
-
-            return subKeys;
-        }
-
-        private CD[] GenerateCDpartsarts(Bit[] permutedKeyByPc1)
+        private CD[] GenerateCdParts(Bit[] permutedKeyByPc1)
         {
             int count = permutedKeyByPc1.Length;
 
@@ -274,36 +287,6 @@
             return subKeys;
         }
 
-        protected Bit[] permuteKeyByPC1()
-        {
-            LinkedList<Bit> permutedKeyLinkedList = new LinkedList<Bit>();
-
-            foreach (int currentPositionPC1 in PC1Table.Table)
-            {
-                permutedKeyLinkedList.AddLast(keyOriginalBitArray[currentPositionPC1 - 1]);
-            }
-
-            return permutedKeyLinkedList.ToArray();
-        }
-
-
-        protected class CD
-        {
-            public Bit[] C { get; set; }
-            public Bit[] D { get; set; }
-        }
-
-        protected Bit[] ToPaddedBitArray(byte[] bytes)
-        {
-            LinkedList<Bit> bitsList = TransformToBitLinkedList(bytes);
-
-            PadWithZeros(bitsList, out int paddingBits, out LinkedList<Bit> paddedBitList);
-
-            AppendPaddingBitsNumber(paddingBits, paddedBitList);
-
-            return paddedBitList.ToArray();
-        }
-
         private void AppendPaddingBitsNumber(int paddingBits, LinkedList<Bit> paddedBitList)
         {
             byte[] intBytes = BitConverter.GetBytes(paddingBits);
@@ -314,7 +297,7 @@
             }
 
             byte paddingBitsCount = intBytes.Last();
-            Bit[] paddingBitsCountAsBitsArray = StripBits(paddingBitsCount);
+            Bit[] paddingBitsCountAsBitsArray = BinaryUtil.StripBits(paddingBitsCount);
 
             BinaryUtil.PrintByteAsBinaryString(paddingBitsCount);
 
@@ -327,8 +310,8 @@
         }
 
 
-        private void PadWithZeros(LinkedList<Bit> bitsList, out int paddingBits,
-            out LinkedList<Bit> paddedBitList)
+        private void PadWithZeros(LinkedList<Bit> bitsList,
+            out int paddingBits, out LinkedList<Bit> paddedBitList)
         {
             int lastByteSize = 8;
 
@@ -348,51 +331,10 @@
         }
 
 
-        private LinkedList<Bit> TransformToBitLinkedList(byte[] bytes)
+        private class CD
         {
-            LinkedList<Bit> bitsList = new LinkedList<Bit>();
-
-            foreach (byte octet in bytes)
-            {
-                Bit[] eightBits = StripBits(octet);
-
-                foreach (Bit bit in eightBits)
-                {
-                    bitsList.AddLast(bit);
-                }
-            }
-
-            return bitsList;
-        }
-
-        protected Bit[] TransformToBitArray(byte[] bytes)
-        {
-            return TransformToBitLinkedList(bytes).ToArray();
-        }
-
-        protected Bit[] StripBits(byte octet)
-        {
-            Bit[] eightBits = new Bit[8];
-
-            for (int i = 0; i < 8; i++)
-            {
-                eightBits[i] = (byte) (octet & (0b1000_0000 >> i));
-            }
-
-            return eightBits;
-        }
-
-        protected Bit[] StripFourBits(byte octet)
-        {
-            Bit[] fourBits = new Bit[4];
-
-            for (int i = 4; i < 8; i++)
-            {
-                int bitIndex = i - 4;
-                fourBits[bitIndex] = (byte) (octet & (0b1000_0000 >> i));
-            }
-
-            return fourBits;
+            public Bit[] C { get; set; }
+            public Bit[] D { get; set; }
         }
     }
 }

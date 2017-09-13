@@ -1,11 +1,7 @@
 ﻿namespace DESEncodeDecodeLib.Encryption
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using AlgorithmTables;
     using Base;
-    using EasySharp.NHelpers.CustomExMethods;
     using Interfaces;
     using Utils;
 
@@ -20,31 +16,15 @@
 
         public byte[] EncryptData()
         {
-            // bytes -> Bits
-            keyOriginalBitArray = TransformToBitArray(key);
-            Bit[] paddedBitArray = ToPaddedBitArray(data);
-
-            // Phase I
-            Bit[] permutedKeyByPc1 = permuteKeyByPC1();
-
-            // Phase II
-            Bit[][] subKeys = GenerateSubKeys(permutedKeyByPc1);
+            InitializeDesEngine(out Bit[] paddedBitArray, out Bit[][] subKeys);
 
             // Phase III (Differs depending on selected mode)
             Bit[] encryptedDataBlocks = EncryptDataBlocks(subKeys, paddedBitArray);
 
             // Bits -> bytes
-            byte[] encryptedBytes = TransformBitsToBytes(encryptedDataBlocks);
+            byte[] encryptedBytes = BinaryUtil.TransformBitsToBytes(encryptedDataBlocks);
 
             return encryptedBytes;
-        }
-
-
-        private Bit[] EncryptDataBlocks(Bit[][] subKeys, Bit[] paddedBitArray)
-        {
-            TransformDataApplyingSubkeys(subKeys, paddedBitArray);
-
-            return paddedBitArray;
         }
 
 
@@ -61,6 +41,14 @@
             FillSourceDataBlockWithDesEncryptedData(data, finalIpPermutationBitArray, from, count);
         }
 
+
+        private Bit[] EncryptDataBlocks(Bit[][] subKeys, Bit[] paddedBitArray)
+        {
+            TransformDataApplyingSubkeys(subKeys, ref paddedBitArray);
+
+            return paddedBitArray;
+        }
+
         private void FillSourceDataBlockWithDesEncryptedData(
             Bit[] sourceDataBits,
             Bit[] encryptedBlock,
@@ -69,8 +57,7 @@
             int index = 0;
             for (int cursor = from; cursor < from + count; cursor++)
             {
-                sourceDataBits[cursor] = encryptedBlock[index];
-                index++;
+                sourceDataBits[cursor] = encryptedBlock[index++];
             }
         }
 
@@ -88,8 +75,5 @@
 
             return r16L16;
         }
-
-
-
     }
 }
