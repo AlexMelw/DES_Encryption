@@ -28,7 +28,7 @@ Copyright (C) 2017
   
 For more information related to each command verb, type:
 
-`cmd> DEScli help verb`, where verb can be either `enc` or `dec`.
+`cmd> DEScli help verb`, where verb can be either `gsk`, `enc` or `dec`.
 
 **The output:**
 
