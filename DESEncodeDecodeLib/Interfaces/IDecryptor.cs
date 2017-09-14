@@ -1,6 +1,6 @@
 ﻿namespace DESEncodeDecodeLib.Interfaces
 {
-    public interface IDesDecryptor
+    public interface IDecryptor
     {
         byte[] DecryptData();
     }

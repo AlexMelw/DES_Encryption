@@ -6,12 +6,12 @@
 
     public static class CryptoFactory
     {
-        public static IDesEncryptor CreateDesEncryptor(byte[] data, byte[] key)
+        public static IEncryptor CreateEncryptor(byte[] data, byte[] key)
         {
             return new DesEncryptor(data, key);
         }
 
-        public static IDesDecryptor CreateDesDecryptor(byte[] data, byte[] key)
+        public static IDecryptor CreateDecryptor(byte[] data, byte[] key)
         {
             return new DesDecryptor(data, key);
         }

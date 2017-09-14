@@ -1,21 +1,24 @@
 ﻿namespace DESEncodeDecodeLib.Encryption
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Base;
     using Interfaces;
     using Utils;
 
-    class DesEncryptor : DesEncryptionBase, IDesEncryptor
+    class DesEncryptor : DesEncryptionBase, IEncryptor
     {
         #region CONSTRUCTORS
 
-        public DesEncryptor(byte[] data, byte[] key) : base(data, key) { }
+        public DesEncryptor(byte[] data, byte[] key) :
+            base(data, key, OperationMode.Encryption) { }
 
         #endregion
 
         public byte[] EncryptData()
         {
-            InitializeDesEngine(out Bit[] paddedBitArray, out Bit[][] subKeys);
+            InitializeDesEngine(out Bit[][] subKeys, out Bit[] paddedBitArray);
 
             // Phase III (Differs depending on selected mode)
             Bit[] encryptedDataBlocks = EncryptDataBlocks(subKeys, paddedBitArray);
@@ -26,7 +29,7 @@
             return encryptedBytes;
         }
 
-        protected override void ApplyDesOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count)
+        protected override Bit[] ApplyDesTransformationOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count)
         {
             Bit[] currentDataBlock = data.Skip(from).Take(count).ToArray();
 
@@ -36,27 +39,32 @@
 
             Bit[] finalIpPermutationBitArray = ComputeFinalIpBitsArray(r16L16);
 
-            FillSourceDataBlockWithDesEncryptedData(data, finalIpPermutationBitArray, from, count);
+            return finalIpPermutationBitArray;
+
+            //FillSourceDataBlockWithDesEncryptedData(data, finalIpPermutationBitArray, from, count);
         }
 
-        private Bit[] EncryptDataBlocks(Bit[][] subKeys, Bit[] paddedBitArray)
+        private Bit[] EncryptDataBlocks(Bit[][] subKeys, Bit[] plainBitArray)
         {
-            TransformDataApplyingSubkeys(subKeys, ref paddedBitArray);
+            Bit[] encryptedBitArray = TransformDataApplyingSubkeys(subKeys, plainBitArray);
 
-            return paddedBitArray;
+            return encryptedBitArray;
         }
 
-        private void FillSourceDataBlockWithDesEncryptedData(
-            Bit[] sourceDataBits,
-            Bit[] encryptedBlock,
-            int from, int count)
-        {
-            int index = 0;
-            for (int cursor = from; cursor < from + count; cursor++)
-            {
-                sourceDataBits[cursor] = encryptedBlock[index++];
-            }
-        }
+        //private void FillSourceDataBlockWithDesEncryptedData(
+        //    Bit[] sourceDataBits,
+        //    Bit[] encryptedBlock,
+        //    int from, int count)
+        //{
+        //LinkedList<Bit> desEncryptedBits = new LinkedList<Bit>();
+
+        //int index = 0;
+        //for (int cursor = from; cursor < from + count; cursor++)
+        //{
+        //    sourceDataBits[cursor] = encryptedBlock[index++];
+        //}
+
+        //}
 
         private Bit[] ComputeR16L16(Bit[][] subKeys, Bit[] ipDataVector)
         {

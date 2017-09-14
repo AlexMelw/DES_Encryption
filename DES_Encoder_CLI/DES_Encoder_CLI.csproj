@@ -7,7 +7,7 @@
     <ProjectGuid>{4EF17CAC-77D8-4999-A8C6-2BEAAF71FC9F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>DES_Encoder_CLI</RootNamespace>
-    <AssemblyName>DesCLI</AssemblyName>
+    <AssemblyName>DEScli</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -49,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EasySharp\NHelpers\NHelpers.csproj">
+      <Project>{CAC83CF1-E5D4-45F6-85CC-E0AD29B55A8E}</Project>
+      <Name>NHelpers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DESEncodeDecodeLib\DESEncodeDecodeLib.csproj">
       <Project>{6cca1bb2-3a1b-4d7c-b644-68fc12ba65b0}</Project>
       <Name>DESEncodeDecodeLib</Name>

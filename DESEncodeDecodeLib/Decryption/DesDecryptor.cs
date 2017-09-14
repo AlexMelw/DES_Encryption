@@ -6,18 +6,18 @@
     using Interfaces;
     using Utils;
 
-    class DesDecryptor : DesEncryptionBase, IDesDecryptor
+    class DesDecryptor : DesEncryptionBase, IDecryptor
     {
         #region CONSTRUCTORS
 
         public DesDecryptor(byte[] data, byte[] key)
-            : base(data, key) { }
+            : base(data, key, OperationMode.Decryption) { }
 
         #endregion
 
         public byte[] DecryptData()
         {
-            InitializeDesEngine(out Bit[] encryptedBitArray, out Bit[][] subKeys);
+            InitializeDesEngine(out Bit[][] subKeys, out Bit[] encryptedBitArray);
 
             // Phase III (Differs depending on selected mode)
             Bit[] decryptedDataBlocks = DecryptDataBlocks(subKeys, encryptedBitArray);
@@ -28,7 +28,7 @@
             return deccryptedBytes;
         }
 
-        protected override void ApplyDesOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count)
+        protected override Bit[] ApplyDesTransformationOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count)
         {
             Bit[] currentDataBlock = data.Skip(from).Take(count).ToArray();
 
@@ -38,15 +38,28 @@
 
             Bit[] finalIpPermutationBitArray = ComputeFinalIpBitsArray(r0L0);
 
-            throw new NotImplementedException();
-            //FillSourceDataBlockWithDesEncryptedData(data, finalIpPermutationBitArray, from, count);
+            return finalIpPermutationBitArray;
         }
 
         private Bit[] DecryptDataBlocks(Bit[][] subKeys, Bit[] encryptedBitArray)
         {
-            TransformDataApplyingSubkeys(subKeys, ref encryptedBitArray);
+            Bit[] plainBitArray = TransformDataApplyingSubkeys(subKeys, encryptedBitArray);
 
-            return encryptedBitArray;
+            Bit[] cutPlainBitArray = RemovePaddingBitsFromPlainBitArray(plainBitArray);
+
+            //Bit[] cutPlainBitArray = plainBitArray;
+
+            return cutPlainBitArray;
+        }
+
+        private static Bit[] RemovePaddingBitsFromPlainBitArray(Bit[] plainBitArray)
+        {
+            Bit[] lastByte = plainBitArray.Skip(plainBitArray.Length - 8).Take(8).ToArray();
+
+            byte paddingBitsCount = BinaryUtil.TransformBitsToBytes(lastByte).Single();
+
+            Bit[] cutPlainBitArray = plainBitArray.Take(plainBitArray.Length - paddingBitsCount).ToArray();
+            return cutPlainBitArray;
         }
 
         private Bit[] ComputeL0R0(Bit[][] subKeys, Bit[] ipDataVector)

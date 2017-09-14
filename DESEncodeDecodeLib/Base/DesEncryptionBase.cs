@@ -9,28 +9,28 @@
 
     abstract class DesEncryptionBase
     {
-        protected const int BlockSize = 64;
-        private readonly byte[] Data;
-        private readonly byte[] Key;
-        private Bit[] Key64BitArray;
+        private const int BlockSize = 64;
+        private readonly byte[] _data;
+        private readonly byte[] _key;
+        private Bit[] _key64BitArray;
+        private readonly OperationMode _operationMode;
 
         #region CONSTRUCTORS
 
-        protected DesEncryptionBase(byte[] data, byte[] key)
+        protected DesEncryptionBase(byte[] data, byte[] key, OperationMode operationMode)
         {
-            Data = data;
-            Key = key;
+            _data = data;
+            _key = key;
+            _operationMode = operationMode;
         }
 
         #endregion
 
-        protected abstract void ApplyDesOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count);
-
-        protected void InitializeDesEngine(out Bit[] paddedBitArray, out Bit[][] subKeys)
+        protected void InitializeDesEngine(out Bit[][] subKeys, out Bit[] paddedBitArray)
         {
             // bytes -> Bits
-            Key64BitArray = TransformToBitArray(Key);
-            paddedBitArray = ToPaddedBitArray(Data);
+            _key64BitArray = TransformToBitArray(_key);
+            paddedBitArray = ToPaddedBitArray(_data);
 
             // Phase I
             Bit[] permutedKeyByPc1 = PermuteKeyByPc1();
@@ -39,16 +39,27 @@
             subKeys = GenerateSubKeys(permutedKeyByPc1);
         }
 
-        protected void TransformDataApplyingSubkeys(Bit[][] subKeys, ref Bit[] paddedBitArray)
+        protected abstract Bit[] ApplyDesTransformationOn64BitBlock(Bit[][] subKeys, Bit[] data, int @from, int count);
+
+        protected Bit[] TransformDataApplyingSubkeys(Bit[][] subKeys, Bit[] paddedBitArray)
         {
+            LinkedList<Bit> encryptedBitArray = new LinkedList<Bit>();
+
             for (int index = 0; index <= paddedBitArray.Length - BlockSize; index += BlockSize)
             {
-                ApplyDesOn64BitBlock(
-                    subKeys,
-                    paddedBitArray,
-                    index,
-                    BlockSize);
+                Bit[] desEncrypted64BitBlock = ApplyDesTransformationOn64BitBlock(
+                    subKeys: subKeys,
+                    data: paddedBitArray,
+                    @from: index,
+                    count: BlockSize); // 64-bit block ( Bit[64] )
+
+                foreach (Bit bit in desEncrypted64BitBlock)
+                {
+                    encryptedBitArray.AddLast(bit);
+                }
             }
+
+            return encryptedBitArray.ToArray();
         }
 
 
@@ -95,7 +106,7 @@
             }
         }
 
-        protected Bit[][] GenerateSubKeys(Bit[] permutedKeyByPc1)
+        private Bit[][] GenerateSubKeys(Bit[] permutedKeyByPc1)
         {
             CD[] cdParts = GenerateCdParts(permutedKeyByPc1);
             Bit[][] subKeys = Generate16SubKeys(cdParts);
@@ -103,19 +114,19 @@
             return subKeys;
         }
 
-        protected Bit[] PermuteKeyByPc1()
+        private Bit[] PermuteKeyByPc1()
         {
             LinkedList<Bit> permutedKeyLinkedList = new LinkedList<Bit>();
 
             foreach (int currentPositionPC1 in PC1Table.Table)
             {
-                permutedKeyLinkedList.AddLast(Key64BitArray[currentPositionPC1 - 1]);
+                permutedKeyLinkedList.AddLast(_key64BitArray[currentPositionPC1 - 1]);
             }
 
             return permutedKeyLinkedList.ToArray();
         }
 
-        protected Bit[] ToPaddedBitArray(byte[] bytes)
+        private Bit[] ToPaddedBitArray(byte[] bytes)
         {
             LinkedList<Bit> bitsList = BinaryUtil.TransformToBitLinkedList(bytes);
 
@@ -126,7 +137,7 @@
             return paddedBitList.ToArray();
         }
 
-        protected Bit[] TransformToBitArray(byte[] bytes)
+        private Bit[] TransformToBitArray(byte[] bytes)
         {
             return BinaryUtil.TransformToBitLinkedList(bytes).ToArray();
         }
@@ -299,30 +310,41 @@
             byte paddingBitsCount = intBytes.Last();
             Bit[] paddingBitsCountAsBitsArray = BinaryUtil.StripBits(paddingBitsCount);
 
-            BinaryUtil.PrintByteAsBinaryString(paddingBitsCount);
+            //BinaryUtil.PrintByteAsBinaryString(paddingBitsCount);
 
             foreach (Bit bit in paddingBitsCountAsBitsArray)
             {
                 paddedBitList.AddLast(bit);
             }
 
-            BinaryUtil.PrintBitArrayAsBinaryString(paddingBitsCountAsBitsArray);
+            //BinaryUtil.PrintBitArrayAsBinaryString(paddingBitsCountAsBitsArray);
         }
 
 
         private void PadWithZeros(LinkedList<Bit> bitsList,
             out int paddingBits, out LinkedList<Bit> paddedBitList)
         {
+            paddedBitList = bitsList;
+
+            if (_operationMode == OperationMode.Decryption)
+            {
+                // We're not padding blocks when we decrypt some bit-array,
+                // because it's length is multiple of 64.
+                paddingBits = 0;
+                return;
+            }
+
             int lastByteSize = 8;
 
             long originalLength = bitsList.LongCount() + lastByteSize;
 
-            int toBePadded = (int) (originalLength % 64);
+            //int toBePadded = (int) (originalLength % 64);
+            int toBePadded = (int) (BlockSize - (originalLength % 64));
 
             paddingBits = toBePadded == 0
                 ? lastByteSize
                 : lastByteSize + toBePadded;
-            paddedBitList = bitsList;
+
 
             for (int i = 0; i < toBePadded; i++)
             {
@@ -336,5 +358,11 @@
             public Bit[] C { get; set; }
             public Bit[] D { get; set; }
         }
+    }
+
+    internal enum OperationMode
+    {
+        Encryption = 1,
+        Decryption = 2
     }
 }
