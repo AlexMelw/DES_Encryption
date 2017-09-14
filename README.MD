@@ -4,9 +4,9 @@ Implemented in C# (.NET Framework 4.6.1) adhering to the Data Encryption Standar
 
 ### Documentation
 
-Type DEScli for help:
+To get some help concerning the use of CLI utility, type:
 
-`cmd> DEScli help`
+`cmd> DEScli --help` or just `cmd> DEScli help`
 
 **The output:**
 
