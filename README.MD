@@ -1,4 +1,4 @@
-# DES Encryption Utility
+# DES Encryption Utility (CLI)
 
 Implemented in C# (.NET Framework 4.6.1) adhering to the Data Encryption Standard algorithm.
 
