@@ -12,7 +12,6 @@
         private const int BlockSize = 64;
         private readonly byte[] _data;
         private readonly byte[] _key;
-        private Bit[] _key64BitArray;
         private readonly OperationMode _operationMode;
 
         #region CONSTRUCTORS
@@ -29,11 +28,11 @@
         protected void InitializeDesEngine(out Bit[][] subKeys, out Bit[] paddedBitArray)
         {
             // bytes -> Bits
-            _key64BitArray = TransformToBitArray(_key);
+            Bit[] key64BitArray = TransformToBitArray(_key);
             paddedBitArray = ToPaddedBitArray(_data);
 
             // Phase I
-            Bit[] permutedKeyByPc1 = PermuteKeyByPc1();
+            Bit[] permutedKeyByPc1 = PermuteKeyByPc1(key64BitArray);
 
             // Phase II
             subKeys = GenerateSubKeys(permutedKeyByPc1);
@@ -114,13 +113,13 @@
             return subKeys;
         }
 
-        private Bit[] PermuteKeyByPc1()
+        private Bit[] PermuteKeyByPc1(Bit[] key)
         {
             LinkedList<Bit> permutedKeyLinkedList = new LinkedList<Bit>();
 
             foreach (int currentPositionPC1 in PC1Table.Table)
             {
-                permutedKeyLinkedList.AddLast(_key64BitArray[currentPositionPC1 - 1]);
+                permutedKeyLinkedList.AddLast(key[currentPositionPC1 - 1]);
             }
 
             return permutedKeyLinkedList.ToArray();
