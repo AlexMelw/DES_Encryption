@@ -7,6 +7,10 @@
     [Verb("enc", HelpText = "Enforces file encryption with the specified key.")]
     class EncryptVerbOptions : CommonSubOptions, IOutputableOption
     {
+        [Option('o', "output",
+            HelpText = "Output File Name. This file will contain the result of the decryption operation.")]
+        public string OutputFilePath { get; set; }
+
         [Usage(ApplicationAlias = "DEScli")]
         public static IEnumerable<Example> Examples
         {
@@ -19,9 +23,5 @@
                 });
             }
         }
-
-        [Option('o', "output",
-            HelpText = "Output File Name. This file will contain the result of the decryption operation.")]
-        public string OutputFilePath { get; set; }
     }
 }

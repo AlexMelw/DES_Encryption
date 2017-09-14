@@ -11,8 +11,11 @@ To get some help concerning the use of CLI utility, type:
 **The output:**
 
 ```
-DES CLI Utility 1.1.2.33456
+DES CLI Utility 1.1.3.41644
 Copyright (C) 2017
+
+  gsk        Generates a 64-bit Strong Key using RNGCryptoServiceProvider class that resides in
+             System.Security.Cryptography namespace. (Recommended)
 
   enc        Enforces file encryption with the specified key.
 

@@ -45,7 +45,9 @@
     <Compile Include="CommonSubOptions.cs" />
     <Compile Include="DecryptVerbOptions.cs" />
     <Compile Include="EncryptVerbOptions.cs" />
+    <Compile Include="GenerateStrongKeyVerbOptions.cs" />
     <Compile Include="IOutputableOption.cs" />
+    <Compile Include="Program.CodeBehind.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
