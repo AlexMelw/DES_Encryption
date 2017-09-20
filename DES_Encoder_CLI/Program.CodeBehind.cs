@@ -70,7 +70,7 @@
         {
             string fileExtension = Path.HasExtension(options.OutputFilePath)
                 ? $".{Path.GetExtension(options.OutputFilePath)}"
-                : ".bin";
+                : string.Empty;
             return fileExtension;
         }
 
