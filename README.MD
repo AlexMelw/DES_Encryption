@@ -11,8 +11,8 @@ To get some help concerning the use of CLI utility, type:
 **The output:**
 
 ```
-DES CLI Utility 1.1.3.41644
-Copyright (C) 2017
+DES CLI Utility 1.1.4.38600
+Copyright (C) 2017. Developed by BARBARII Veaceslav
 
   gsk        Generates a 64-bit Strong Key using RNGCryptoServiceProvider class that resides in
              System.Security.Cryptography namespace. (Recommended)
@@ -33,17 +33,19 @@ For more information related to each command verb, type:
 **The output:**
 
 ```
-DES CLI Utility 1.1.2.33456
-Copyright (C) 2017
+DES CLI Utility 1.1.4.38600
+Copyright (C) 2017. Developed by BARBARII Veaceslav
 USAGE:
 Encryption:
   DEScli enc --input ToBeEncrypted.ext --key Key64bit.ext --output Encrypted.ext
 
-  -o, --output    Output File Name. This file will contain the result of the decryption operation.
-
   -i, --input     Required. Source file containing the data to be encrypted with a given key.
 
-  -k, --key       Required. Path to file containing 64-bit key for encryption of data from supplied file.
+  -k, --key       Required. Path to file containing 64-bit key for data encryption from supplied
+                  file.
+
+  -o, --output    Output File Name. This file will contain the result of the decryption
+                  operation.
 
   --help          Display this help screen.
 
