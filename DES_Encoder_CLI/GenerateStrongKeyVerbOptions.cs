@@ -1,4 +1,4 @@
-﻿namespace DES_Encoder_CLI
+﻿namespace DEScli
 {
     using System.Collections.Generic;
     using CommandLine;
