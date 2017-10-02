@@ -24,7 +24,7 @@
         public static IEnumerable<Example> Examples
         {
             get {
-                yield return new Example("Decryption", new EncryptVerbOptions
+                yield return new Example("Decryption", new DecryptVerbOptions
                 {
                     KeyPath = "Key64bit.ext",
                     InputFilePath = "ToBeDecrypted.ext",

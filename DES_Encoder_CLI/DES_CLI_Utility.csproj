@@ -49,12 +49,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DecryptVerbOptions.cs" />
-    <Compile Include="EncryptVerbOptions.cs" />
-    <Compile Include="GenerateStrongKeyVerbOptions.cs" />
-    <Compile Include="IOutputableOption.cs" />
-    <Compile Include="Program.CodeBehind.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Options\DecryptVerbOptions.cs" />
+    <Compile Include="Options\EncryptVerbOptions.cs" />
+    <Compile Include="Options\GenerateStrongKeyVerbOptions.cs" />
+    <Compile Include="Interfaces\IOutputableOption.cs" />
+    <Compile Include="Facade\Program.CodeBehind.cs" />
+    <Compile Include="Facade\Program.CommandProcessor.cs" />
+    <Compile Include="Facade\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -78,5 +79,6 @@
   <ItemGroup>
     <Content Include="Key.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
