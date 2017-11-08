@@ -10,6 +10,9 @@
     {
         private static void ProcessDecryptCommand(DecryptVerbOptions options)
         {
+            string inputFilePath = options.InputFilePath;
+            Console.Out.WriteLine($@"The file ""{Path.GetFileName(inputFilePath)}"" is being decrypted...");
+
             byte[] inputByteArray = File.ReadAllBytes(options.InputFilePath);
             byte[] keyByteArray = File.ReadAllBytes(options.KeyPath);
 
@@ -25,7 +28,10 @@
 
         private static void ProcessEncryptCommand(EncryptVerbOptions options)
         {
-            byte[] inputByteArray = File.ReadAllBytes(options.InputFilePath);
+            string inputFilePath = options.InputFilePath;
+            Console.Out.WriteLine($@"The file ""{Path.GetFileName(inputFilePath)}"" is being encrypted...");
+
+            byte[] inputByteArray = File.ReadAllBytes(inputFilePath);
             byte[] keyByteArray = File.ReadAllBytes(options.KeyPath);
 
             IEncryptor desEncryptor = CryptoFactory.CreateEncryptor(inputByteArray, keyByteArray);
@@ -40,6 +46,7 @@
 
         private static void ProcessGenerateSKCommand(GenerateStrongKeyVerbOptions options)
         {
+            Console.Out.WriteLine("The strong key is being generated...");
             byte[] secureKey = RandomNumbersUtil.GenerateRandomNumbers(8);
 
             GenerateOutputFileNameIfNotSet(options);
