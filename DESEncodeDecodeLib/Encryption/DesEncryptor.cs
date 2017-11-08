@@ -1,9 +1,8 @@
 ﻿namespace DESEncodeDecodeLib.Encryption
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Base;
+    using Enums;
     using Interfaces;
     using Utils;
 

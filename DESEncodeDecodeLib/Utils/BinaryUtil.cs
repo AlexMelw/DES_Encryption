@@ -72,7 +72,7 @@
 
             foreach (byte octet in bytes)
             {
-                Bit[] eightBits = BinaryUtil.StripBits(octet);
+                Bit[] eightBits = StripBits(octet);
 
                 foreach (Bit bit in eightBits)
                 {

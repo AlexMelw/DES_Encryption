@@ -5,6 +5,7 @@
     using System.Linq;
     using AlgorithmTables;
     using EasySharp.NHelpers.CustomExMethods;
+    using Enums;
     using Utils;
 
     abstract class DesEncryptionBase
@@ -47,10 +48,10 @@
             for (int index = 0; index <= paddedBitArray.Length - BlockSize; index += BlockSize)
             {
                 Bit[] desEncrypted64BitBlock = ApplyDesTransformationOn64BitBlock(
-                    subKeys: subKeys,
-                    data: paddedBitArray,
-                    @from: index,
-                    count: BlockSize); // 64-bit block ( Bit[64] )
+                    subKeys,
+                    paddedBitArray,
+                    index,
+                    BlockSize); // 64-bit block ( Bit[64] )
 
                 foreach (Bit bit in desEncrypted64BitBlock)
                 {
@@ -338,7 +339,7 @@
             long originalLength = bitsList.LongCount() + lastByteSize;
 
             //int toBePadded = (int) (originalLength % 64);
-            int toBePadded = (int) (BlockSize - (originalLength % 64));
+            int toBePadded = (int) (BlockSize - originalLength % 64);
 
             paddingBits = toBePadded == 0
                 ? lastByteSize
@@ -357,11 +358,5 @@
             public Bit[] C { get; set; }
             public Bit[] D { get; set; }
         }
-    }
-
-    internal enum OperationMode
-    {
-        Encryption = 1,
-        Decryption = 2
     }
 }

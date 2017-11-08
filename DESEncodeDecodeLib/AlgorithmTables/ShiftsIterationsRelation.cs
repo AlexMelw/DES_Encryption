@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DESEncodeDecodeLib.AlgorithmTables
+﻿namespace DESEncodeDecodeLib.AlgorithmTables
 {
+    using System.Collections.Generic;
+
     public static class ShiftsIterationsRelation
     {
         public static Dictionary<int, int> ShiftsNumberDictionary { get; } = new Dictionary<int, int>

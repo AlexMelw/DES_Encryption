@@ -48,6 +48,7 @@
     <Compile Include="AlgorithmTables\PC2Table.cs" />
     <Compile Include="AlgorithmTables\SBoxMapper.cs" />
     <Compile Include="AlgorithmTables\ShiftsIterationsRelation.cs" />
+    <Compile Include="Enums\OperationMode.cs" />
     <Compile Include="Bit.cs" />
     <Compile Include="CryptoFactory.cs" />
     <Compile Include="Decryption\DesDecryptor.cs" />
